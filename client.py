@@ -3,8 +3,9 @@ import threading
 
 #Create globle variable to check if the message from self.
 middle = ''
-
-
+username = str(input('Enter your name: '))
+while len(username)==0:
+    username = str(input('Enter your name: '))
 
 def connect():
     lock = threading.Lock()
@@ -13,30 +14,38 @@ def connect():
     serip = '192.168.1.238' #Server ip
     port = 23165
     host = customer.connect((serip, port))
+    print(f'User {username} connected on {serip}, you can send exit to exit to program.')
     return customer
 
 # send and receive data
 def recv():
-    while True:
-        msg = customer.recv(1024)
-        data = msg.decode()
-        if data == middle:
-            continue
-        print('--------------')
-        print(f"{data}")
-        print('--------------')
+    try:
+        while True:
+            msg = customer.recv(1024)
+            data = msg.decode()
+            if data == middle:
+                continue
+            print(f"{data}")
+            print('--------------')
+    except (ConnectionAbortedError):
+        print("You have successfully exited!")
 
 def send():
     global middle
-    serip = '192.168.1.238'
+
     while True:
         data = input()
-        middle = serip +"send: \n"+data
+        if data == "exit":
+            customer.send(f'{username} exited!~'.encode())
+            customer.close()
+            break
+        middle = username +" send: \n-->"+data
         customer.send(middle.encode())
 
 
 if __name__ == '__main__':
     customer = connect()
+    customer.send(f'{username} is online!'.encode())
     t1 = threading.Thread(target=recv)
     t2 = threading.Thread(target=send)
     t1.start()
