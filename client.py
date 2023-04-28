@@ -1,6 +1,8 @@
 import socket
 import threading
 
+serip = '192.168.1.238' #Server ip
+port = 23165
 #Create globle variable to check if the message from self.
 middle = ''
 username = str(input('Enter your name: '))
@@ -11,8 +13,6 @@ def connect():
     lock = threading.Lock()
     # create a socket object
     customer = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    serip = '192.168.1.238' #Server ip
-    port = 23165
     host = customer.connect((serip, port))
     print(f'User {username} connected on {serip}, you can send exit to exit to program.')
     return customer
